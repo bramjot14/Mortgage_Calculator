@@ -39,7 +39,10 @@ app.post('/calculate', (req, res) => {
     const mortgageRate = parseFloat(req.body.mortgage_rate) / 100;
     const paymentFrequency = req.body.payment_frequency;
 
+    console.log(`Received input - Price: ${price}, Down Payment: ${downPaymentPercentage}, Amortization: ${amortization}, Mortgage Rate: ${mortgageRate}, Payment Frequency: ${paymentFrequency}`);
+
     if (isNaN(price) || isNaN(downPaymentPercentage) || isNaN(amortization) || isNaN(mortgageRate)) {
+        console.error("Invalid input data");
         return res.status(400).send("Invalid input data");
     }
 
@@ -60,7 +63,10 @@ app.post('/calculate', (req, res) => {
         minimumDownPaymentPercentage = 20;
     }
 
+    console.log(`Calculated Minimum Down Payment: ${minimumDownPayment}`);
+
     if (downPayment < minimumDownPayment) {
+        console.warn(`Down payment is less than the minimum required: ${minimumDownPaymentPercentage.toFixed(2)}%`);
         return res.render('index', {
             cmhcInsurance: null,
             insuredMortgage: null,
@@ -77,29 +83,33 @@ app.post('/calculate', (req, res) => {
     const totalMortgage = price - downPayment;
     const cmhcInsurance = calculateCMHCInsurance(totalMortgage, price, downPayment);
     const insuredMortgage = totalMortgage + cmhcInsurance;
-    
+
+    console.log(`CMHC Insurance: ${cmhcInsurance}, Insured Mortgage: ${insuredMortgage}`);
+
     let numPayments;
     let paymentRate;
 
     switch(paymentFrequency) {
         case "Bi-weekly":
-            numPayments = amortization * 26; // 26 bi-weekly payments per year
+            numPayments = amortization * 26;
             paymentRate = mortgageRate / 26;
             break;
         case "Weekly":
-            numPayments = amortization * 52; // 52 weekly payments per year
+            numPayments = amortization * 52;
             paymentRate = mortgageRate / 52;
             break;
         case "Annually":
-            numPayments = amortization; // 1 payment per year
-            paymentRate = mortgageRate; // annual rate
+            numPayments = amortization;
+            paymentRate = mortgageRate;
             break;
-        default: // Monthly
-            numPayments = amortization * 12; // 12 monthly payments per year
-            paymentRate = mortgageRate / 12; // monthly rate
+        default:
+            numPayments = amortization * 12;
+            paymentRate = mortgageRate / 12;
     }
 
     const payment = calculateMortgage(insuredMortgage, numPayments, paymentRate);
+
+    console.log(`Calculated Payment: ${payment}`);
 
     res.render('index', { 
         cmhcInsurance, 
@@ -114,8 +124,6 @@ app.post('/calculate', (req, res) => {
         error: null 
     });
 });
-
-
 
 
 function calculateMortgage(insuredMortgage, numPayments, paymentRate) {
@@ -145,3 +153,7 @@ function calculateCMHCInsurance(totalMortgage, price, downPayment) {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+
+
+

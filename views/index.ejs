@@ -6,183 +6,336 @@
     <title>Mortgage Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Body Styling */
         body {
-            background: #f8f9fa;
+            background: linear-gradient(120deg, #f0f2f5, #dfe7ed);
             font-family: 'Poppins', sans-serif;
             color: #333;
+            padding: 20px;
         }
+
+        /* Container && Card */
         .container {
-            max-width: 800px;
-            margin: 50px auto;
-            margin-top: 15px;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 20px;
             overflow: hidden;
         }
-        .card-header {
-            font-size: 1.75rem;
-            text-align: center;
-            background-color: #0062cc;
-            color: white;
-            padding: 20px;
-            font-weight: bold;
-            border-bottom: 5px solid #0056b3;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .card-body {
-            padding: 30px;
-            background: white;
+
+        .header input {
+            max-width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 8px;
         }
-        .form-control {
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 10px;
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .grid-item {
+            background-color: #f7f9fc;
             padding: 15px;
-            color: #333;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .form-control:focus {
-            box-shadow: 0 0 10px rgba(0, 98, 204, 0.5);
-            border: 1px solid #0062cc;
-            background-color: #e9ecef;
-        }
-        .form-group label {
-            font-weight: bold;
-            color: #333;
-        }
-        .btn-primary {
-            width: 100%;
-            background-color: #0062cc;
-            border: none;
-            padding: 12px;
-            font-size: 1.25rem;
+            border: 1px solid #ddd;
             border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            box-shadow: 0 4px 15px rgba(0, 98, 204, 0.3);
-            transform: translateY(-3px);
-        }
-        .result {
             text-align: center;
-            margin-top: 30px;
-            font-size: 1.5rem;
-            color: #0062cc;
+        }
+
+        .grid-item input {
+            width: 100%;
+            border: none;
+            background-color: #ffffff;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
             font-weight: bold;
         }
-        hr {
-            border-top: 2px solid #f0f0f0;
+
+        .payment-result {
+            background-color: #e0f7ff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #007bff;
+            font-size: 20px;
         }
-        @media (max-width: 767px) {
-            .card-body {
-                padding: 20px;
-            }
-            .btn-primary {
-                font-size: 1rem;
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
             }
         }
+
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div class="card">
-            <div class="card-header">
-                Mortgage Payment Calculator
+        <div class="header">
+            <span>Start here ➔</span>
+            <input type="number" placeholder="Price" id="price" name="price" value="500000" oninput="updateDownPayments()">
+            <input type="text" placeholder="Location" value="Toronto, ON" disabled>
+        </div>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">Down payment 1 (%)</div>
+                <input type="number" step="0.01" id="down_payment1" name="down_payment1" value="20" oninput="updateDownPaymentValues(1)">
+                <div id="down_payment_value1"></div>
             </div>
-<form action="/calculate" method="post">
-    <div class="card-body">
-        <div class="form-group mb-4">
-            <label for="price">Price</label>
-            <input type="number" class="form-control" id="price" name="price" value="<%= typeof price !== 'undefined' && price !== null ? price : '' %>" placeholder="Enter amount" step="0.01" required>
+            <div class="grid-item">
+                <div class="grid-item-header">Down payment 2 (%)</div>
+                <input type="number" step="0.01" id="down_payment2" name="down_payment2" value="30" oninput="updateDownPaymentValues(2)">
+                <div id="down_payment_value2"></div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Down payment 3 (%)</div>
+                <input type="number" step="0.01" id="down_payment3" name="down_payment3" value="40" oninput="updateDownPaymentValues(3)">
+                <div id="down_payment_value3"></div>
+            </div>
         </div>
-        <hr>
-        <div class="form-group mb-4">
-            <label for="down_payment">Down payment (%)</label>
-            <input type="number" class="form-control" id="down_payment" name="down_payment" value="<%= typeof downPaymentPercentage !== 'undefined' && downPaymentPercentage !== null ? downPaymentPercentage : '' %>" placeholder="Enter percentage" step="0.01" required>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">CMHC insurance 1</div>
+                <div id="result-cmhc1">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">CMHC insurance 2</div>
+                <div id="result-cmhc2">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">CMHC insurance 3</div>
+                <div id="result-cmhc3">$0.00</div>
+            </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-4 form-group mb-4">
-                <label for="amortization">Amortization (Years)</label>
-                <select class="form-control" id="amortization" name="amortization">
-                    <option value="1" <%= amortization == 1 ? 'selected' : '' %>>1</option>
-                    <option value="2" <%= amortization == 2 ? 'selected' : '' %>>2</option>
-                    <option value="3" <%= amortization == 3 ? 'selected' : '' %>>3</option>
-                    <option value="4" <%= amortization == 4 ? 'selected' : '' %>>4</option>
-                    <option value="5" <%= amortization == 5 ? 'selected' : '' %>>5</option>
-                    <option value="6" <%= amortization == 6 ? 'selected' : '' %>>6</option>
-                    <option value="7" <%= amortization == 7 ? 'selected' : '' %>>7</option>
-                    <option value="8" <%= amortization == 8 ? 'selected' : '' %>>8</option>
-                    <option value="9" <%= amortization == 9 ? 'selected' : '' %>>9</option>
-                    <option value="10" <%= amortization == 10 ? 'selected' : '' %>>10</option>
-                    <option value="11" <%= amortization == 11 ? 'selected' : '' %>>11</option>
-                    <option value="12" <%= amortization == 12 ? 'selected' : '' %>>12</option>
-                    <option value="13" <%= amortization == 13 ? 'selected' : '' %>>13</option>
-                    <option value="14" <%= amortization == 14 ? 'selected' : '' %>>14</option>
-                    <option value="15" <%= amortization == 15 ? 'selected' : '' %>>15</option>
-                    <option value="16" <%= amortization == 16 ? 'selected' : '' %>>16</option>
-                    <option value="17" <%= amortization == 17 ? 'selected' : '' %>>17</option>
-                    <option value="18" <%= amortization == 18 ? 'selected' : '' %>>18</option>
-                    <option value="19" <%= amortization == 19 ? 'selected' : '' %>>19</option>
-                    <option value="20" <%= amortization == 20 ? 'selected' : '' %>>20</option>
-                    <option value="21" <%= amortization == 21 ? 'selected' : '' %>>21</option>
-                    <option value="22" <%= amortization == 22 ? 'selected' : '' %>>22</option>
-                    <option value="23" <%= amortization == 23 ? 'selected' : '' %>>23</option>
-                    <option value="24" <%= amortization == 24 ? 'selected' : '' %>>24</option>
-                    <option value="25" <%= amortization == 25 ? 'selected' : '' %>>25</option>
-                    <option value="26" <%= amortization == 26 ? 'selected' : '' %>>26</option>
-                    <option value="27" <%= amortization == 27 ? 'selected' : '' %>>27</option>
-                    <option value="28" <%= amortization == 28 ? 'selected' : '' %>>28</option>
-                    <option value="29" <%= amortization == 29 ? 'selected' : '' %>>29</option>
-                    <option value="30" <%= amortization == 30 ? 'selected' : '' %>>30</option>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">Total mortgage 1</div>
+                <div id="result-total-mortgage1">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Total mortgage 2</div>
+                <div id="result-total-mortgage2">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Total mortgage 3</div>
+                <div id="result-total-mortgage3">$0.00</div>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">Amortization 1 (Years)</div>
+                <input type="number" id="amortization1" name="amortization1" value="25" oninput="calculateMortgage(1)">
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Amortization 2 (Years)</div>
+                <input type="number" id="amortization2" name="amortization2" value="25" oninput="calculateMortgage(2)">
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Amortization 3 (Years)</div>
+                <input type="number" id="amortization3" name="amortization3" value="25" oninput="calculateMortgage(3)">
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">Mortgage rate 1 (%)</div>
+                <input type="number" step="0.01" id="mortgage_rate1" name="mortgage_rate1" value="4.29" oninput="calculateMortgage(1)">
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Mortgage rate 2 (%)</div>
+                <input type="number" step="0.01" id="mortgage_rate2" name="mortgage_rate2" value="4.29" oninput="calculateMortgage(2)">
+            </div>
+            <div class="grid-item">
+                <div class="grid-item-header">Mortgage rate 3 (%)</div>
+                <input type="number" step="0.01" id="mortgage_rate3" name="mortgage_rate3" value="4.29" oninput="calculateMortgage(3)">
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-item-header">Payment frequency 1</div>
+                <select id="payment_frequency1" name="payment_frequency1" onchange="calculateMortgage(1)">
+                    <option value="Monthly">Monthly</option>
+                    <option value="Bi-weekly">Bi-weekly</option>
+                    <option value="Weekly">Weekly</option>
                 </select>
             </div>
-            <div class="col-md-4 form-group mb-4">
-                <label for="mortgage_rate">Mortgage rate (%)</label>
-                <input type="number" class="form-control" id="mortgage_rate" value="<%= typeof mortgageRate !== 'undefined' && mortgageRate !== null ? mortgageRate : '4.29' %>" name="mortgage_rate" placeholder="Enter rate" step="0.01" required>
+            <div class="grid-item">
+                <div class="grid-item-header">Payment frequency 2</div>
+                <select id="payment_frequency2" name="payment_frequency2" onchange="calculateMortgage(2)">
+                    <option value="Monthly">Monthly</option>
+                    <option value="Bi-weekly">Bi-weekly</option>
+                    <option value="Weekly">Weekly</option>
+                </select>
             </div>
-
-            <div class="col-md-4 form-group mb-4">
-                <label for="payment_frequency">Payment frequency</label>
-                <select class="form-control" id="payment_frequency" name="payment_frequency">
-                    <option value="Monthly" <%= paymentFrequency == 'Monthly' ? 'selected' : '' %>>Monthly</option>
-                    <option value="Bi-weekly" <%= paymentFrequency == 'Bi-weekly' ? 'selected' : '' %>>Bi-weekly</option>
-                    <option value="Weekly" <%= paymentFrequency == 'Weekly' ? 'selected' : '' %>>Weekly</option>
-                    <option value="Annually" <%= paymentFrequency == 'Annually' ? 'selected' : '' %>>Annually</option>
+            <div class="grid-item">
+                <div class="grid-item-header">Payment frequency 3</div>
+                <select id="payment_frequency3" name="payment_frequency3" onchange="calculateMortgage(3)">
+                    <option value="Monthly">Monthly</option>
+                    <option value="Bi-weekly">Bi-weekly</option>
+                    <option value="Weekly">Weekly</option>
                 </select>
             </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Calculate</button>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="payment-result" id="result-payment1">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="payment-result" id="result-payment2">$0.00</div>
+            </div>
+            <div class="grid-item">
+                <div class="payment-result" id="result-payment3">$0.00</div>
             </div>
         </div>
-    </div>
-</form>
 
-            <% if (error) { %>
-                <div class="alert alert-danger text-center">
-                  <%= error %>
-                </div>
-              <% } %>
-              
-            <% if (payment !== null) { %>
-            <div class="result">
-                <p>Price - Down payment + CMHC insurance = Total Mortgage</p>
-                <p>$<%= price %> - $<%= downPayment %> + $<%= cmhcInsurance %> = $<%= insuredMortgage.toFixed(2) %></p>
-                <br>
-                <p>Total Mortgage: $<%=  insuredMortgage.toFixed(2) %></p>
-                <p><%= paymentFrequency %> Payment: $<%=  payment.toFixed(2) %></p>
-            </div>
-            <% } %>
-        </div>
+        <div class="error-message" id="error-message"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateDownPayments() {
+            const price = parseFloat(document.getElementById('price').value);
+            if (isNaN(price)) {
+                clearResults();
+                document.getElementById('error-message').innerText = 'Please enter a valid price.';
+                return;
+            }
+
+            updateDownPaymentValues(1);
+            updateDownPaymentValues(2);
+            updateDownPaymentValues(3);
+        }
+
+        function updateDownPaymentValues(index) {
+            const price = parseFloat(document.getElementById('price').value);
+            const downPaymentPercentage = parseFloat(document.getElementById(`down_payment${index}`).value);
+            if (isNaN(price) || isNaN(downPaymentPercentage)) {
+                clearResult(index);
+                document.getElementById('error-message').innerText = 'Please enter valid inputs for price and down payment percentage.';
+                return;
+            }
+
+            const downPayment = (downPaymentPercentage / 100) * price;
+            document.getElementById(`down_payment_value${index}`).innerText = `$${downPayment.toFixed(2)}`;
+
+            calculateMortgage(index);  // Recalculate mortgage details for the specific index
+        }
+
+        function calculateMortgage(index) {
+            const price = parseFloat(document.getElementById('price').value);
+            const downPayment = parseFloat(document.getElementById(`down_payment_value${index}`).innerText.replace('$', '').replace(',', ''));
+            const amortization = parseInt(document.getElementById(`amortization${index}`).value);
+            const mortgageRate = parseFloat(document.getElementById(`mortgage_rate${index}`).value) / 100;
+            const paymentFrequency = document.getElementById(`payment_frequency${index}`).value;
+
+            if (!validateDownPayment(price, downPayment, index)) {
+                clearResult(index);
+                return;
+            }
+
+            const totalMortgage = price - downPayment;
+            const cmhcInsurance = calculateCMHCInsurance(totalMortgage, price, downPayment);
+            const insuredMortgage = totalMortgage + cmhcInsurance;
+
+            const payment = calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency);
+
+            document.getElementById(`result-cmhc${index}`).innerText = `$${cmhcInsurance.toFixed(2)}`;
+            document.getElementById(`result-total-mortgage${index}`).innerText = `$${insuredMortgage.toFixed(2)}`;
+            document.getElementById(`result-payment${index}`).innerText = `$${payment.toFixed(2)}`;
+        }
+
+        function validateDownPayment(price, downPayment, index) {
+            let minimumDownPayment;
+            if (price <= 500000) {
+                minimumDownPayment = 0.05 * price;
+            } else if (price > 500000 && price < 1000000) {
+                minimumDownPayment = (0.05 * 500000) + (0.10 * (price - 500000));
+            } else {
+                minimumDownPayment = 0.20 * price;
+            }
+
+            if (downPayment < minimumDownPayment) {
+                document.getElementById('error-message').innerText = `The minimum down payment for a property of $${price.toFixed(2)} is ${(minimumDownPayment / price * 100).toFixed(2)}%. Please increase your down payment.`;
+                return false;
+            }
+
+            document.getElementById('error-message').innerText = '';  // Clear error message if inputs are valid
+            return true;
+        }
+
+        function calculateCMHCInsurance(totalMortgage, price, downPayment) {
+            const downPaymentPercentage = (downPayment / price) * 100;
+            let insuranceRate = 0;
+
+            if (downPaymentPercentage < 5) {
+                throw new Error("Minimum down payment is 5%");
+            } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
+                insuranceRate = 4.00;
+            } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
+                insuranceRate = 3.10;
+            } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
+                insuranceRate = 2.80;
+            } else {
+                return 0;
+            }
+
+            return (insuranceRate / 100) * totalMortgage;
+        }
+
+        function calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency) {
+            let numPayments;
+            let paymentRate;
+
+            switch(paymentFrequency) {
+                case "Bi-weekly":
+                    numPayments = amortization * 26;
+                    paymentRate = mortgageRate / 26;
+                    break;
+                case "Weekly":
+                    numPayments = amortization * 52;
+                    paymentRate = mortgageRate / 52;
+                    break;
+                default:
+                    numPayments = amortization * 12;
+                    paymentRate = mortgageRate / 12;
+            }
+
+            return (insuredMortgage * paymentRate * Math.pow(1 + paymentRate, numPayments)) /
+                   (Math.pow(1 + paymentRate, numPayments) - 1);
+        }
+
+        function clearResults() {
+            for (let i = 1; i <= 3; i++) {
+                clearResult(i);
+            }
+        }
+
+        function clearResult(index) {
+            document.getElementById(`result-cmhc${index}`).innerText = '$0.00';
+            document.getElementById(`result-total-mortgage${index}`).innerText = '$0.00';
+            document.getElementById(`result-payment${index}`).innerText = '$0.00';
+        }
+
+    </script>
+
 </body>
 </html>
