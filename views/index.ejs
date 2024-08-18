@@ -6,64 +6,135 @@
     <title>Mortgage Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Body Styling */
-        body {
-            background: linear-gradient(120deg, #f0f2f5, #dfe7ed);
-            font-family: 'Poppins', sans-serif;
-            color: #333;
-            padding: 20px;
-        }
-
-        /* Container && Card */
+        /* Container & Card */
         .container {
             max-width: 1200px;
             margin: auto;
-            background: #fff;
+            background: #f8f9fa; /* Slightly off-white background for a subtle contrast */
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             padding: 20px;
             overflow: hidden;
         }
-
+    
+        /* Highlighted Row */
+        .highlight-row {
+            background-color: #e0f7ff; /* Light blue background */
+            font-weight: bold;
+            color: #007bff; /* Blue text color */
+        }
+    
+        /* Total Mortgage Highlight */
+        .total-mortgage-row .row-label,
+        .total-mortgage-row .grid-item {
+            background-color: #e0f7ff; /* Light blue background for entire row */
+            font-weight: bold;
+            color: #007bff; /* Blue text color */
+        }
+    
+        /* Mortgage Payment Highlight */
+        .mortgage-payment-row .row-label,
+        .mortgage-payment-row .grid-item {
+            background-color: #d1ecf1; /* Slightly different blue background for variety */
+            font-weight: bold;
+            color: #007bff; /* Blue text color */
+        }
+    
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr 3fr; /* Adjust the proportions as needed */
             margin-bottom: 20px;
+            gap: 15px;
         }
-
+    
+        .header span {
+            grid-column: 1 / span 1; /* Span across the first column */
+            display: flex;
+            align-items: center;
+            font-weight: bold; /* Add bold to make it stand out */
+            color: #495057; /* Slightly darker gray */
+        }
+    
+        .header input#price {
+            grid-column: 2 / span 2; /* Span across the second and third columns */
+        }
+    
+        .header input[placeholder="Location"] {
+            grid-column: 4 / span 2; /* Span across the fourth and fifth columns */
+        }
+    
         .header input {
-            max-width: 200px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            padding: 8px;
+            border-radius: 8px; /* Slightly rounded corners */
+            border: 1px solid #ced4da; /* Light gray border for subtle definition */
+            padding: 10px; /* Add padding for a larger input area */
+            width: 100%; /* Make the input take the full width of its container */
+            box-sizing: border-box; /* Ensures padding is included in the width */
+            background-color: #fff; /* Ensure a clean white background */
+            font-size: 1rem; /* Increase font size for readability */
+            transition: border-color 0.3s ease; /* Smooth transition for border color */
         }
-
+    
+        .header input:focus {
+            border-color: #007bff; /* Blue border on focus */
+            outline: none; /* Remove the default outline */
+        }
+    
+        .row-label {
+            font-weight: bold;
+            padding-right: 10px;
+            text-align: center; /* Center the text horizontally */
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the text within the label */
+            width: 150px; /* Fixed width for labels */
+            margin: auto; /* Center the label container */
+            color: #495057; /* Slightly darker gray */
+        }
+    
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 150px repeat(4, 1fr); /* Adjusted to account for the label width */
             gap: 15px;
             margin-bottom: 20px;
         }
-
+    
         .grid-item {
-            background-color: #f7f9fc;
+            background-color: #fff; /* White background */
             padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
+            border: 1px solid #ced4da; /* Light gray border */
+            border-radius: 10px; /* Rounded corners for a softer look */
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+            transition: box-shadow 0.3s ease; /* Smooth transition for hover effect */
         }
-
+    
+        .grid-item:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly larger shadow on hover */
+        }
+    
         .grid-item input {
             width: 100%;
             border: none;
-            background-color: #ffffff;
+            background-color: #f8f9fa; /* Slightly off-white background */
             padding: 8px;
             border-radius: 5px;
             text-align: center;
             font-weight: bold;
+            font-size: 1rem; /* Increase font size for readability */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle inset shadow for depth */
         }
-
+    
+        .down-payment-value {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef; /* Light gray background */
+            border: 1px solid #ced4da; /* Light gray border */
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem; /* Increase font size for readability */
+            color: #495057; /* Slightly darker gray */
+        }
+    
         .payment-result {
             background-color: #e0f7ff;
             padding: 15px;
@@ -72,106 +143,394 @@
             font-weight: bold;
             color: #007bff;
             font-size: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+        }
+    
+    /* General input styling */
+    input,
+    select {
+        appearance: none; /* Remove default styles */
+        background-color: #fff;
+        border: 1px solid #ced4da; /* Light gray border */
+        border-radius: 8px; /* Rounded corners */
+        padding: 8px 12px; /* Consistent padding */
+        font-size: 1rem; /* Font size for readability */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+        transition: border-color 0.3s ease; /* Smooth transition for border color */
+        width: 100%; /* Full width for better UI */
+        height: 38px; /* Set a consistent height */
+        line-height: 1.5; /* Consistent line height */
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #007bff; /* Blue border on focus */
+        outline: none; /* Remove the default outline */
+    }
+
+    /* Custom arrow for select fields */
+    select {
+        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"%3E%3Cpath fill="%23007bff" d="M2 0L0 2h4z"/%3E%3C/svg%3E'); /* Small dropdown arrow */
+        background-repeat: no-repeat;
+        background-position: right 10px center; /* Position arrow on the right */
+        background-size: 10px 10px; /* Size of the arrow */
+    }
+
+    /* Custom Scrollbar Styling for Dropdowns */
+    select::-webkit-scrollbar {
+        width: 10px; /* Set width of the scrollbar */
+    }
+
+    select::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light gray background for the scrollbar track */
+        border-radius: 8px; /* Rounded track */
+    }
+
+    select::-webkit-scrollbar-thumb {
+        background-color: #007bff; /* Blue color for the scrollbar thumb */
+        border-radius: 8px; /* Rounded thumb */
+        border: 2px solid #f1f1f1; /* Border around the thumb */
+    }
+
+    select::-webkit-scrollbar-thumb:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+
+        /* Heading Styles */
+        .calculator-heading {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff; /* Blue text color to match theme */
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle text shadow for depth */
+        }
+    
+        .error-message {
+            color: red;
+            font-size: 0.9em; /* Smaller font size */
+            margin-top: 5px; /* Slight margin to separate from the input field */
         }
 
+        .cash-close-section {
+            padding: 20px;
+        }
+
+        .cash-close-section label {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .cash-close-section input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .cash-close-section input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .cash-close-section .total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ced4da;
+        }
+
+        .form-select {
+            border-radius: 5px;
+            padding: 5px;
+            width: 100%;
+            border: 1px solid #ced4da;
+        }
+
+        .down-payment-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-group button {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-group button.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .total {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ced4da;
+}
+
+.highlight {
+    color: #007bff;
+    font-weight: bold;
+}
+
+    
         @media (max-width: 768px) {
             .grid-container {
                 grid-template-columns: 1fr;
             }
         }
-
     </style>
+    
 </head>
 <body>
 
+    <!-- Heading -->
+    <header class="calculator-heading">
+        Mortgage Payment Calculator
+    </header>
     <div class="container">
         <div class="header">
             <span>Start here ➔</span>
-            <input type="number" placeholder="Price" id="price" name="price" value="500000" oninput="updateDownPayments()">
-            <input type="text" placeholder="Location" value="Toronto, ON" disabled>
-        </div>
-
-        <div class="grid-container">
-            <div class="grid-item">
-                <div class="grid-item-header">Down payment 1 (%)</div>
-                <input type="number" step="0.01" id="down_payment1" name="down_payment1" value="20" oninput="updateDownPaymentValues(1)">
-                <div id="down_payment_value1"></div>
+            
+            <!-- Price input with label -->
+            <div class="input-group" style="grid-column: 2 / 4;">
+                <label for="price">Price</label>
+                <input type="number" placeholder="Price" id="price" name="price" oninput="updateDownPayments()">
+                <div id="error-message-price" class="error-message"></div> <!-- Error message container -->
             </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Down payment 2 (%)</div>
-                <input type="number" step="0.01" id="down_payment2" name="down_payment2" value="30" oninput="updateDownPaymentValues(2)">
-                <div id="down_payment_value2"></div>
-            </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Down payment 3 (%)</div>
-                <input type="number" step="0.01" id="down_payment3" name="down_payment3" value="40" oninput="updateDownPaymentValues(3)">
-                <div id="down_payment_value3"></div>
+            
+            <!-- Location input with label -->
+            <div class="input-group" style="grid-column: 4 / 5;">
+                <label for="location">Location</label>
+                <input type="text" placeholder="Location" id="location" value="Toronto, ON" disabled>
             </div>
         </div>
-
+        <hr>
+    
+        <!-- Down payment row -->
         <div class="grid-container">
-            <div class="grid-item">
-                <div class="grid-item-header">CMHC insurance 1</div>
-                <div id="result-cmhc1">$0.00</div>
+            <div class="row-label">
+                <b style="color: #007bff; padding-right: 3px;">-</b> Down payment
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">CMHC insurance 2</div>
-                <div id="result-cmhc2">$0.00</div>
+                <input type="number" step="0.01" id="down_payment1" name="down_payment1" value="6.67" oninput="onMortgageCalculatorInputChange(); updateDownPaymentValues(1);">
+                <div id="down_payment_value1" class="down-payment-value"></div>
+                <div id="error-message1" class="error-message"></div> <!-- Error message container -->
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">CMHC insurance 3</div>
-                <div id="result-cmhc3">$0.00</div>
+                <input type="number" step="0.01" id="down_payment2" name="down_payment2" value="10" oninput="onMortgageCalculatorInputChange(); updateDownPaymentValues(2);">
+                <div id="down_payment_value2" class="down-payment-value"></div>
+                <div id="error-message2" class="error-message"></div> <!-- Error message container -->
+            </div>
+            <div class="grid-item">
+                <input type="number" step="0.01" id="down_payment3" name="down_payment3" value="15" oninput="onMortgageCalculatorInputChange(); updateDownPaymentValues(3);">
+                <div id="down_payment_value3" class="down-payment-value"></div>
+                <div id="error-message3" class="error-message"></div> <!-- Error message container -->
+            </div>
+            <div class="grid-item">
+                <input type="number" step="0.01" id="down_payment4" name="down_payment4" value="20" oninput="onMortgageCalculatorInputChange(); updateDownPaymentValues(4);">
+                <div id="down_payment_value4" class="down-payment-value"></div>
+                <div id="error-message4" class="error-message"></div> <!-- Error message container -->
+            </div>
+        </div>
+    
+        <!-- CMHC insurance row -->
+        <div class="grid-container">
+            <div class="row-label"><b style="color: #007bff; padding-right: 3px;">+</b> CMHC Insurance</div>
+            <div class="grid-item" id="result-cmhc1"></div>
+            <div class="grid-item" id="result-cmhc2"></div>
+            <div class="grid-item" id="result-cmhc3"></div>
+            <div class="grid-item" id="result-cmhc4"></div>
+        </div>
+    
+        <!-- Total mortgage row (highlighted) -->
+        <div class="grid-container total-mortgage-row">
+            <div class="row-label">Total mortgage</div>
+            <div class="grid-item" id="result-total-mortgage1"></div>
+            <div class="grid-item" id="result-total-mortgage2"></div>
+            <div class="grid-item" id="result-total-mortgage3"></div>
+            <div class="grid-item" id="result-total-mortgage4"></div>
+        </div>
+    
+        <!-- Amortization row -->
+        <div class="grid-container">
+            <div class="row-label">Amortization</div>
+            <div class="grid-item">
+                <select id="amortization1" name="amortization1" onchange="calculateMortgage(1)">
+                    <option value="1-Year">1-Year</option>
+                    <option value="2-Year">2-Year</option>
+                    <option value="3-Year">3-Year</option>
+                    <option value="4-Year">4-Year</option>
+                    <option value="5-Year">5-Year</option>
+                    <option value="6-Year">6-Year</option>
+                    <option value="7-Year">7-Year</option>
+                    <option value="8-Year">8-Year</option>
+                    <option value="9-Year">9-Year</option>
+                    <option value="10-Year">10-Year</option>
+                    <option value="11-Year">11-Year</option>
+                    <option value="12-Year">12-Year</option>
+                    <option value="13-Year">13-Year</option>
+                    <option value="14-Year">14-Year</option>
+                    <option value="15-Year">15-Year</option>
+                    <option value="16-Year">16-Year</option>
+                    <option value="17-Year">17-Year</option>
+                    <option value="18-Year">18-Year</option>
+                    <option value="19-Year">19-Year</option>
+                    <option value="20-Year">20-Year</option>
+                    <option value="21-Year">21-Year</option>
+                    <option value="22-Year">22-Year</option>
+                    <option value="23-Year">23-Year</option>
+                    <option value="24-Year">24-Year</option>
+                    <option value="25-Year" selected>25-Year</option>
+                    <option value="26-Year">26-Year</option>
+                    <option value="27-Year">27-Year</option>
+                    <option value="28-Year">28-Year</option>
+                    <option value="29-Year">29-Year</option>
+                    <option value="30-Year">30-Year</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <select id="amortization2" name="amortization2" onchange="calculateMortgage(2)">
+                    <option value="1-Year">1-Year</option>
+                    <option value="2-Year">2-Year</option>
+                    <option value="3-Year">3-Year</option>
+                    <option value="4-Year">4-Year</option>
+                    <option value="5-Year">5-Year</option>
+                    <option value="6-Year">6-Year</option>
+                    <option value="7-Year">7-Year</option>
+                    <option value="8-Year">8-Year</option>
+                    <option value="9-Year">9-Year</option>
+                    <option value="10-Year">10-Year</option>
+                    <option value="11-Year">11-Year</option>
+                    <option value="12-Year">12-Year</option>
+                    <option value="13-Year">13-Year</option>
+                    <option value="14-Year">14-Year</option>
+                    <option value="15-Year">15-Year</option>
+                    <option value="16-Year">16-Year</option>
+                    <option value="17-Year">17-Year</option>
+                    <option value="18-Year">18-Year</option>
+                    <option value="19-Year">19-Year</option>
+                    <option value="20-Year">20-Year</option>
+                    <option value="21-Year">21-Year</option>
+                    <option value="22-Year">22-Year</option>
+                    <option value="23-Year">23-Year</option>
+                    <option value="24-Year">24-Year</option>
+                    <option value="25-Year" selected>25-Year</option>
+                    <option value="26-Year">26-Year</option>
+                    <option value="27-Year">27-Year</option>
+                    <option value="28-Year">28-Year</option>
+                    <option value="29-Year">29-Year</option>
+                    <option value="30-Year">30-Year</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <select id="amortization3" name="amortization3" onchange="calculateMortgage(3)">
+                    <option value="1-Year">1-Year</option>
+                    <option value="2-Year">2-Year</option>
+                    <option value="3-Year">3-Year</option>
+                    <option value="4-Year">4-Year</option>
+                    <option value="5-Year">5-Year</option>
+                    <option value="6-Year">6-Year</option>
+                    <option value="7-Year">7-Year</option>
+                    <option value="8-Year">8-Year</option>
+                    <option value="9-Year">9-Year</option>
+                    <option value="10-Year">10-Year</option>
+                    <option value="11-Year">11-Year</option>
+                    <option value="12-Year">12-Year</option>
+                    <option value="13-Year">13-Year</option>
+                    <option value="14-Year">14-Year</option>
+                    <option value="15-Year">15-Year</option>
+                    <option value="16-Year">16-Year</option>
+                    <option value="17-Year">17-Year</option>
+                    <option value="18-Year">18-Year</option>
+                    <option value="19-Year">19-Year</option>
+                    <option value="20-Year">20-Year</option>
+                    <option value="21-Year">21-Year</option>
+                    <option value="22-Year">22-Year</option>
+                    <option value="23-Year">23-Year</option>
+                    <option value="24-Year">24-Year</option>
+                    <option value="25-Year" selected>25-Year</option>
+                    <option value="26-Year">26-Year</option>
+                    <option value="27-Year">27-Year</option>
+                    <option value="28-Year">28-Year</option>
+                    <option value="29-Year">29-Year</option>
+                    <option value="30-Year">30-Year</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <select id="amortization4" name="amortization4" onchange="calculateMortgage(4)">
+                    <option value="1-Year">1-Year</option>
+                    <option value="2-Year">2-Year</option>
+                    <option value="3-Year">3-Year</option>
+                    <option value="4-Year">4-Year</option>
+                    <option value="5-Year">5-Year</option>
+                    <option value="6-Year">6-Year</option>
+                    <option value="7-Year">7-Year</option>
+                    <option value="8-Year">8-Year</option>
+                    <option value="9-Year">9-Year</option>
+                    <option value="10-Year">10-Year</option>
+                    <option value="11-Year">11-Year</option>
+                    <option value="12-Year">12-Year</option>
+                    <option value="13-Year">13-Year</option>
+                    <option value="14-Year">14-Year</option>
+                    <option value="15-Year">15-Year</option>
+                    <option value="16-Year">16-Year</option>
+                    <option value="17-Year">17-Year</option>
+                    <option value="18-Year">18-Year</option>
+                    <option value="19-Year">19-Year</option>
+                    <option value="20-Year">20-Year</option>
+                    <option value="21-Year">21-Year</option>
+                    <option value="22-Year">22-Year</option>
+                    <option value="23-Year">23-Year</option>
+                    <option value="24-Year">24-Year</option>
+                    <option value="25-Year" selected>25-Year</option>
+                    <option value="26-Year">26-Year</option>
+                    <option value="27-Year">27-Year</option>
+                    <option value="28-Year">28-Year</option>
+                    <option value="29-Year">29-Year</option>
+                    <option value="30-Year">30-Year</option>
+                </select>
             </div>
         </div>
 
+    
+        <!-- Mortgage rate row -->
         <div class="grid-container">
+            <div class="row-label">Mortgage rate</div>
             <div class="grid-item">
-                <div class="grid-item-header">Total mortgage 1</div>
-                <div id="result-total-mortgage1">$0.00</div>
-            </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Total mortgage 2</div>
-                <div id="result-total-mortgage2">$0.00</div>
-            </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Total mortgage 3</div>
-                <div id="result-total-mortgage3">$0.00</div>
-            </div>
-        </div>
-
-        <div class="grid-container">
-            <div class="grid-item">
-                <div class="grid-item-header">Amortization 1 (Years)</div>
-                <input type="number" id="amortization1" name="amortization1" value="25" oninput="calculateMortgage(1)">
-            </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Amortization 2 (Years)</div>
-                <input type="number" id="amortization2" name="amortization2" value="25" oninput="calculateMortgage(2)">
-            </div>
-            <div class="grid-item">
-                <div class="grid-item-header">Amortization 3 (Years)</div>
-                <input type="number" id="amortization3" name="amortization3" value="25" oninput="calculateMortgage(3)">
-            </div>
-        </div>
-
-        <div class="grid-container">
-            <div class="grid-item">
-                <div class="grid-item-header">Mortgage rate 1 (%)</div>
                 <input type="number" step="0.01" id="mortgage_rate1" name="mortgage_rate1" value="4.29" oninput="calculateMortgage(1)">
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">Mortgage rate 2 (%)</div>
                 <input type="number" step="0.01" id="mortgage_rate2" name="mortgage_rate2" value="4.29" oninput="calculateMortgage(2)">
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">Mortgage rate 3 (%)</div>
                 <input type="number" step="0.01" id="mortgage_rate3" name="mortgage_rate3" value="4.29" oninput="calculateMortgage(3)">
             </div>
-        </div>
-
-        <div class="grid-container">
             <div class="grid-item">
-                <div class="grid-item-header">Payment frequency 1</div>
+                <input type="number" step="0.01" id="mortgage_rate4" name="mortgage_rate4" value="4.29" oninput="calculateMortgage(4)">
+            </div>
+        </div>
+    
+        <!-- Payment frequency row -->
+        <div class="grid-container">
+            <div class="row-label">Payment frequency</div>
+            <div class="grid-item">
                 <select id="payment_frequency1" name="payment_frequency1" onchange="calculateMortgage(1)">
                     <option value="Monthly">Monthly</option>
                     <option value="Bi-weekly">Bi-weekly</option>
@@ -179,7 +538,6 @@
                 </select>
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">Payment frequency 2</div>
                 <select id="payment_frequency2" name="payment_frequency2" onchange="calculateMortgage(2)">
                     <option value="Monthly">Monthly</option>
                     <option value="Bi-weekly">Bi-weekly</option>
@@ -187,8 +545,14 @@
                 </select>
             </div>
             <div class="grid-item">
-                <div class="grid-item-header">Payment frequency 3</div>
                 <select id="payment_frequency3" name="payment_frequency3" onchange="calculateMortgage(3)">
+                    <option value="Monthly">Monthly</option>
+                    <option value="Bi-weekly">Bi-weekly</option>
+                    <option value="Weekly">Weekly</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <select id="payment_frequency4" name="payment_frequency4" onchange="calculateMortgage(4)">
                     <option value="Monthly">Monthly</option>
                     <option value="Bi-weekly">Bi-weekly</option>
                     <option value="Weekly">Weekly</option>
@@ -196,75 +560,478 @@
             </div>
         </div>
 
-        <div class="grid-container">
-            <div class="grid-item">
-                <div class="payment-result" id="result-payment1">$0.00</div>
+        <div class="container">
+    
+            <!-- Mortgage payment row (highlighted) -->
+            <div class="grid-container mortgage-payment-row">
+                <div class="row-label">Mortgage payment</div>
+                <div class="grid-item" id="result-payment1"></div>
+                <div class="grid-item" id="result-payment2"></div>
+                <div class="grid-item" id="result-payment3"></div>
+                <div class="grid-item" id="result-payment4"></div>
             </div>
-            <div class="grid-item">
-                <div class="payment-result" id="result-payment2">$0.00</div>
-            </div>
-            <div class="grid-item">
-                <div class="payment-result" id="result-payment3">$0.00</div>
-            </div>
+        
         </div>
 
-        <div class="error-message" id="error-message"></div>
+    <div class="container">
+        <h2 class="calculator-heading">Cash needed to close</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <p>When you purchase a house, there are a number of costs you will need to put aside in addition to your down payment.</p>
+                <label for="down-payment-options">Down payment options</label>
+                <select id="down-payment-options" class="form-select" onchange="updateDownPaymentOption()">
+                    <option value="6.7">Scenario 1 (6.7% down)</option>
+                    <option value="10">Scenario 2 (10% down)</option>
+                    <option value="15">Scenario 3 (15% down)</option>
+                    <option value="20">Scenario 4 (20% down)</option>
+                </select>
+                <div class="down-payment-options mt-4">
+                    <button id="houseBtn" class="active" onclick="toggleType('house')">House</button>
+                    <button id="condoBtn" onclick="toggleType('condo')">Condo</button>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="cash-close-section">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="down-payment-amount">Down payment</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div id="down-payment-amount" class="highlight">$50,000</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="land-transfer-tax">Land transfer tax</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div id="land-transfer-tax" class="highlight">$22,950</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="pst-mortgage-insurance">PST on mortgage insurance</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div id="pst-mortgage-insurance" class="highlight">$2,240</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="lawyer-fees">Lawyer fees</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <input type="number" id="lawyer-fees" value="1000" class="form-control cost-input" onchange="calculateCashNeeded()">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="title-insurance">Title insurance</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <input type="number" id="title-insurance" value="900" class="form-control cost-input" onchange="calculateCashNeeded()">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="home-inspection">Home inspection</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <input type="number" id="home-inspection" value="500" class="form-control cost-input" onchange="calculateCashNeeded()">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="appraisal-fees">Appraisal fees</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <input type="number" id="appraisal-fees" value="300" class="form-control cost-input" onchange="calculateCashNeeded()">
+                        </div>
+                    </div>
+                    <!-- New Estoppel Fee Row (Visible for Condo Only) -->
+                    <div class="row mb-3" id="estoppel-row" style="display: none;">
+                        <div class="col-6">
+                            <label for="estoppel-fee">Estoppel fee</label>
+                        </div>
+                        <div class="col-6 text-end">
+                            <input type="number" id="estoppel-fee" value="0" class="form-control cost-input" onchange="calculateCashNeeded()">
+                        </div>
+                    </div>
+                    <div class="row total">
+                        <div class="col-6">
+                            Cash needed to close
+                        </div>
+                        <div class="col-6 text-end">
+                            <span id="cash-needed">$77,890</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Expenses Section -->
+    <div class="container">
+        <h2 class="calculator-heading">Monthly Expenses</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <label for="down-payment-options">Down payment options</label>
+                <select id="expense-down-payment-options" class="form-select" onchange="updateMonthlyExpensesScenario()">
+                    <option value="1">Scenario 1 (6.7% down)</option>
+                    <option value="2">Scenario 2 (10% down)</option>
+                    <option value="3">Scenario 3 (15% down)</option>
+                    <option value="4">Scenario 4 (20% down)</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Mortgage payment</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div id="monthly-expense-mortgage-payment">$3,945</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Property tax</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="property-tax" value="625" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Monthly debt payments</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="monthly-debt-payments" value="0" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Utilities</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="utilities" value="185" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Property insurance</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="property-insurance" value="50" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Phone</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="phone" value="60" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Cable</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="cable" value="20" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Internet</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <input type="number" id="internet" value="60" class="form-control cost-input" onchange="calculateTotalMonthlyExpenses()">
+                    </div>
+                </div>
+                <div class="row total">
+                    <div class="col-6">
+                        Monthly expenses
+                    </div>
+                    <div class="col-6 text-end">
+                        <span id="total-monthly-expenses" class="highlight">$4,945</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Ontario Land Transfer Tax rates
+        const ontarioLandTransferTaxRates = [
+            { threshold: 55000, rate: 0.005 },  // 0.5% on the first $55,000
+            { threshold: 195000, rate: 0.01 },  // 1.0% on the portion from $55,000 to $250,000 (250,000 - 55,000)
+            { threshold: 150000, rate: 0.015 }, // 1.5% on the portion from $250,000 to $400,000 (400,000 - 250,000)
+            { threshold: 1600000, rate: 0.02 }, // 2.0% on the portion from $400,000 to $2,000,000 (2,000,000 - 400,000)
+            { threshold: Infinity, rate: 0.025 } // 2.5% on the portion over $2,000,000
+        ];
+        
+        // Toronto Municipal Land Transfer Tax rates
+        const torontoLandTransferTaxRates = [
+            { threshold: 55000, rate: 0.005 },  // 0.5% on the first $55,000
+            { threshold: 195000, rate: 0.01 },  // 1.0% on the portion from $55,000 to $250,000 (250,000 - 55,000)
+            { threshold: 150000, rate: 0.015 }, // 1.5% on the portion from $250,000 to $400,000 (400,000 - 250,000)
+            { threshold: 1600000, rate: 0.02 }, // 2.0% on the portion from $400,000 to $2,000,000 (2,000,000 - 400,000)
+            { threshold: Infinity, rate: 0.025 } // 2.5% on the portion over $2,000,000
+        ];
+        
+        // Function to calculate land transfer tax based on property price and tax rates
+        function calculateLandTransferTax(price, taxRates) {
+            let tax = 0;
+            let remainingPrice = price;
+        
+            for (let i = 0; i < taxRates.length; i++) {
+                const { threshold, rate } = taxRates[i];
+        
+                if (remainingPrice > threshold) {
+                    tax += threshold * rate;
+                    remainingPrice -= threshold;
+                } else {
+                    tax += remainingPrice * rate;
+                    break;
+                }
+            }
+        
+            return tax;
+        }
+        
+        // Function to calculate total land transfer tax in Toronto (Ontario + Municipal)
+        function calculateTotalLandTransferTax(price) {
+            const ontarioTax = calculateLandTransferTax(price, ontarioLandTransferTaxRates);
+            const torontoTax = calculateLandTransferTax(price, torontoLandTransferTaxRates);
+            return ontarioTax + torontoTax;
+        }
+        
+        // Function to reset and update cost inputs when price changes
+        function resetCostInputs() {
+            document.getElementById('lawyer-fees').value = 1000;
+            document.getElementById('title-insurance').value = 900;
+            document.getElementById('home-inspection').value = 500;
+            document.getElementById('appraisal-fees').value = 300;
+            document.getElementById('estoppel-fee').value = 0;
+        }
+        
+        // Function to clear cash needed to close values
+        function clearCashNeededToClose() {
+            document.getElementById('down-payment-amount').innerText = 'None';
+            document.getElementById('land-transfer-tax').innerText = 'None';
+            document.getElementById('pst-mortgage-insurance').innerText = 'None';
+            document.getElementById('cash-needed').innerText = 'None';
+        
+            // Clear the cost input fields
+            document.getElementById('lawyer-fees').value = '';
+            document.getElementById('title-insurance').value = '';
+            document.getElementById('home-inspection').value = '';
+            document.getElementById('appraisal-fees').value = '';
+            document.getElementById('estoppel-fee').value = '';
+        }
+        
+        // Function to toggle between property types (House and Condo)
+        function toggleType(type) {
+            document.getElementById('houseBtn').classList.remove('active');
+            document.getElementById('condoBtn').classList.remove('active');
+        
+            const price = parseFloat(document.getElementById('price').value);
+        
+            if (type === 'house') {
+                document.getElementById('houseBtn').classList.add('active');
+                document.getElementById('estoppel-row').style.display = 'none'; // Hide Estoppel fee for House
+            } else if (type === 'condo') {
+                document.getElementById('condoBtn').classList.add('active');
+                document.getElementById('estoppel-row').style.display = 'flex'; // Show Estoppel fee for Condo
+            }
+        
+            // Update the land transfer tax dynamically based on the price
+            const landTransferTax = calculateTotalLandTransferTax(price);
+            document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
+        
+            calculateCashNeeded(); // Update the total cash needed to close
+        }
+        
+        // Function to calculate CMHC Insurance rate based on down payment percentage
+        function calculateInsuranceRate(downPaymentPercentage) {
+            if (downPaymentPercentage < 5) {
+                return 0;
+            } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
+                return 4.00;
+            } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
+                return 3.10;
+            } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
+                return 2.80;
+            } else {
+                return 0;
+            }
+        }
+        
+        // Function to update down payment option based on user selection
+        function updateDownPaymentOption() {
+            const downPaymentOption = parseFloat(document.getElementById('down-payment-options').value);
+            const price = parseFloat(document.getElementById('price').value);
+        
+            const downPayment = (downPaymentOption / 100) * price;
+            document.getElementById('down-payment-amount').innerText = `$${downPayment.toLocaleString()}`;
+        
+            // Update PST on mortgage insurance
+            if (downPaymentOption < 20) {
+                const insuredMortgage = price - downPayment;
+                const cmhcInsurance = (insuredMortgage * calculateInsuranceRate(downPaymentOption)) / 100;
+                const pstMortgageInsurance = cmhcInsurance * 0.08; // 8% PST on mortgage insurance
+                document.getElementById('pst-mortgage-insurance').innerText = `$${pstMortgageInsurance.toFixed(2)}`;
+            } else {
+                document.getElementById('pst-mortgage-insurance').innerText = '$0.00';
+            }
+        
+            calculateCashNeeded(); // Update the total cash needed to close
+            updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
+        }
+        
+        // Function to calculate the total cash needed to close based on various inputs
+        function calculateCashNeeded() {
+            const downPayment = parseFloat(document.getElementById('down-payment-amount').innerText.replace('$', '').replace(',', '')) || 0;
+            const landTransferTax = parseFloat(document.getElementById('land-transfer-tax').innerText.replace('$', '').replace(',', '')) || 0;
+            const pstMortgageInsurance = parseFloat(document.getElementById('pst-mortgage-insurance').innerText.replace('$', '').replace(',', '')) || 0;
+            const lawyerFees = parseFloat(document.getElementById('lawyer-fees').value) || 0;
+            const titleInsurance = parseFloat(document.getElementById('title-insurance').value) || 0;
+            const homeInspection = parseFloat(document.getElementById('home-inspection').value) || 0;
+            const appraisalFees = parseFloat(document.getElementById('appraisal-fees').value) || 0;
+            const estoppelFee = parseFloat(document.getElementById('estoppel-fee').value) || 0;
+        
+            // Include Estoppel fee in the calculation
+            const cashNeeded = downPayment + landTransferTax + pstMortgageInsurance + lawyerFees + titleInsurance + homeInspection + appraisalFees + estoppelFee;
+            document.getElementById('cash-needed').innerText = `$${cashNeeded.toFixed(2)}`;
+        }
+        
+        // Function to update the down payment options in the "Cash needed to close" section
+        function updateDownPaymentOptionsFromCalculator() {
+            const downPaymentSelect = document.getElementById('down-payment-options');
+            downPaymentSelect.innerHTML = '';
+        
+            downPaymentValues.forEach((value, index) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.text = `Scenario ${index + 1} (${value.toFixed(2)}% down)`;
+                downPaymentSelect.appendChild(option);
+            });
+        
+            // Automatically select the first option and update the down payment scenario
+            downPaymentSelect.selectedIndex = 0;
+            updateDownPaymentOption();
+        }
+        
+        // Function to update down payment values based on user input from the mortgage calculator
+// Function to update down payment values based on user input from the mortgage calculator
+function updateDownPaymentValuesFromCalculator() {
+    // Assuming these values come from the mortgage calculator inputs
+    const dp1 = parseFloat(document.getElementById('down_payment1').value) || 0;
+    const dp2 = parseFloat(document.getElementById('down_payment2').value) || 0;
+    const dp3 = parseFloat(document.getElementById('down_payment3').value) || 0;
+    const dp4 = parseFloat(document.getElementById('down_payment4').value) || 0;
+
+    downPaymentValues = [dp1, dp2, dp3, dp4];
+
+    // Update the down payment options in both sections
+    updateDownPaymentOptionsFromCalculator(); // For "Cash needed to close"
+    updateDownPaymentOptionsForExpenses(); // For "Monthly Expenses"
+}
+
+        
+        // Update Down Payment and Other Values Based on Price Input
         function updateDownPayments() {
             const price = parseFloat(document.getElementById('price').value);
-            if (isNaN(price)) {
+            const errorMessagePrice = document.getElementById('error-message-price');
+        
+            if (isNaN(price) || price === 0) {
                 clearResults();
-                document.getElementById('error-message').innerText = 'Please enter a valid price.';
+                clearCashNeededToClose(); // Clear the "Cash needed to close" values
+                errorMessagePrice.innerText = 'Please enter a valid price.';
                 return;
             }
-
+        
+            // Clear the error message if the price is valid
+            errorMessagePrice.innerText = '';
+        
+            // Reset all cost inputs
+            resetCostInputs();
+        
+            // Update Down Payment Values
             updateDownPaymentValues(1);
             updateDownPaymentValues(2);
             updateDownPaymentValues(3);
+            updateDownPaymentValues(4);
+        
+            // Update Cash Needed to Close Section
+            updateDownPaymentOptionsFromCalculator();
+            updateDownPaymentOption();
+        
+            // Dynamically update the land transfer tax
+            const landTransferTax = calculateTotalLandTransferTax(price);
+            document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
+        
+            calculateCashNeeded(); // Update the total cash needed to close
         }
-
+        
         function updateDownPaymentValues(index) {
             const price = parseFloat(document.getElementById('price').value);
             const downPaymentPercentage = parseFloat(document.getElementById(`down_payment${index}`).value);
+            const errorMessage = document.getElementById(`error-message${index}`);
+        
             if (isNaN(price) || isNaN(downPaymentPercentage)) {
                 clearResult(index);
-                document.getElementById('error-message').innerText = 'Please enter valid inputs for price and down payment percentage.';
+                errorMessage.innerText = 'Please enter valid down payment percentage.';
                 return;
             }
-
+        
+            // Clear the error message if both inputs are valid
+            errorMessage.innerText = '';
+        
             const downPayment = (downPaymentPercentage / 100) * price;
             document.getElementById(`down_payment_value${index}`).innerText = `$${downPayment.toFixed(2)}`;
-
+        
             calculateMortgage(index);  // Recalculate mortgage details for the specific index
         }
-
+        
+        
         function calculateMortgage(index) {
-            const price = parseFloat(document.getElementById('price').value);
-            const downPayment = parseFloat(document.getElementById(`down_payment_value${index}`).innerText.replace('$', '').replace(',', ''));
-            const amortization = parseInt(document.getElementById(`amortization${index}`).value);
-            const mortgageRate = parseFloat(document.getElementById(`mortgage_rate${index}`).value) / 100;
-            const paymentFrequency = document.getElementById(`payment_frequency${index}`).value;
+    const price = parseFloat(document.getElementById('price').value);
+    const downPayment = parseFloat(document.getElementById(`down_payment_value${index}`).innerText.replace('$', '').replace(',', ''));
+    const amortization = parseInt(document.getElementById(`amortization${index}`).value);
+    const mortgageRate = parseFloat(document.getElementById(`mortgage_rate${index}`).value) / 100;
+    const paymentFrequency = document.getElementById(`payment_frequency${index}`).value;
 
-            if (!validateDownPayment(price, downPayment, index)) {
-                clearResult(index);
-                return;
-            }
+    if (!validateDownPayment(price, downPayment, index)) {
+        clearResult(index);
+        return;
+    }
 
-            const totalMortgage = price - downPayment;
-            const cmhcInsurance = calculateCMHCInsurance(totalMortgage, price, downPayment);
-            const insuredMortgage = totalMortgage + cmhcInsurance;
+    const totalMortgage = price - downPayment;
+    const cmhcInsurance = calculateCMHCInsurance(totalMortgage, price, downPayment);
+    const insuredMortgage = totalMortgage + cmhcInsurance;
 
-            const payment = calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency);
+    // Calculate the mortgage payment based on the selected payment frequency
+    const payment = calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency);
 
-            document.getElementById(`result-cmhc${index}`).innerText = `$${cmhcInsurance.toFixed(2)}`;
-            document.getElementById(`result-total-mortgage${index}`).innerText = `$${insuredMortgage.toFixed(2)}`;
-            document.getElementById(`result-payment${index}`).innerText = `$${payment.toFixed(2)}`;
-        }
+    // Calculate the monthly payment specifically for the "Monthly Expenses" section
+    const monthlyPayment = calculatePayment(insuredMortgage, amortization, mortgageRate, "Monthly");
+
+    document.getElementById(`result-cmhc${index}`).innerText = `$${cmhcInsurance.toFixed(2)}`;
+    document.getElementById(`result-total-mortgage${index}`).innerText = `$${insuredMortgage.toFixed(2)}`;
+    document.getElementById(`result-payment${index}`).innerText = `$${payment.toFixed(2)}`;
+
+    // Store the monthly payment in a data attribute for later use in the "Monthly Expenses" section
+    document.getElementById(`result-payment${index}`).setAttribute('data-monthly-payment', monthlyPayment.toFixed(2));
+
+    updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
+}
+
 
         function validateDownPayment(price, downPayment, index) {
             let minimumDownPayment;
+            const errorMessageElement = document.getElementById(`error-message${index}`);
+            
             if (price <= 500000) {
                 minimumDownPayment = 0.05 * price;
             } else if (price > 500000 && price < 1000000) {
@@ -272,20 +1039,20 @@
             } else {
                 minimumDownPayment = 0.20 * price;
             }
-
+        
             if (downPayment < minimumDownPayment) {
-                document.getElementById('error-message').innerText = `The minimum down payment for a property of $${price.toFixed(2)} is ${(minimumDownPayment / price * 100).toFixed(2)}%. Please increase your down payment.`;
+                errorMessageElement.innerText = `The minimum down payment for a property of $${price.toFixed(2)} is ${(minimumDownPayment / price * 100).toFixed(2)}%. Please increase your down payment.`;
                 return false;
             }
-
-            document.getElementById('error-message').innerText = '';  // Clear error message if inputs are valid
+        
+            errorMessageElement.innerText = '';  // Clear error message if inputs are valid
             return true;
         }
-
+        
         function calculateCMHCInsurance(totalMortgage, price, downPayment) {
             const downPaymentPercentage = (downPayment / price) * 100;
             let insuranceRate = 0;
-
+        
             if (downPaymentPercentage < 5) {
                 throw new Error("Minimum down payment is 5%");
             } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
@@ -297,45 +1064,145 @@
             } else {
                 return 0;
             }
-
+        
             return (insuranceRate / 100) * totalMortgage;
         }
-
+        
         function calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency) {
-            let numPayments;
-            let paymentRate;
+    let numPayments;
+    let paymentRate;
 
-            switch(paymentFrequency) {
-                case "Bi-weekly":
-                    numPayments = amortization * 26;
-                    paymentRate = mortgageRate / 26;
-                    break;
-                case "Weekly":
-                    numPayments = amortization * 52;
-                    paymentRate = mortgageRate / 52;
-                    break;
-                default:
-                    numPayments = amortization * 12;
-                    paymentRate = mortgageRate / 12;
-            }
+    switch (paymentFrequency) {
+        case "Bi-weekly":
+            numPayments = amortization * 26; // 26 bi-weekly payments per year
+            paymentRate = mortgageRate / 26; // Divide annual rate by 26
+            break;
+        case "Weekly":
+            numPayments = amortization * 52; // 52 weekly payments per year
+            paymentRate = mortgageRate / 52; // Divide annual rate by 52
+            break;
+        default:
+            numPayments = amortization * 12; // 12 monthly payments per year
+            paymentRate = mortgageRate / 12; // Divide annual rate by 12
+    }
 
-            return (insuredMortgage * paymentRate * Math.pow(1 + paymentRate, numPayments)) /
-                   (Math.pow(1 + paymentRate, numPayments) - 1);
-        }
+    // Calculate the mortgage payment using the standard formula
+    return (insuredMortgage * paymentRate * Math.pow(1 + paymentRate, numPayments)) /
+           (Math.pow(1 + paymentRate, numPayments) - 1);
+}
 
+        
         function clearResults() {
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 clearResult(i);
             }
         }
-
+        
         function clearResult(index) {
             document.getElementById(`result-cmhc${index}`).innerText = '$0.00';
             document.getElementById(`result-total-mortgage${index}`).innerText = '$0.00';
             document.getElementById(`result-payment${index}`).innerText = '$0.00';
         }
+        
+        // Initial setup
+        let downPaymentValues = [6.7, 10, 15, 20]; // Default values as percentages
+        updateDownPaymentOptionsFromCalculator();
+        
+        // Ensure all calculations are done on page load and when inputs change
+        document.addEventListener("DOMContentLoaded", function() {
+            updateAllCalculations(); // Initial calculation when page loads
+        });
+        
+        function updateAllCalculations() {
+            updateDownPayments();
+            updateDownPaymentOption();
+            calculateCashNeeded();
+        }
+        
+        // Attach `oninput` event listeners to update calculations as the user types
+        document.querySelectorAll('.cost-input').forEach(input => {
+            input.addEventListener('input', calculateCashNeeded);
+        });
 
-    </script>
+        // Function to update the Monthly Expenses section based on selected scenario
+        // Function to update the Monthly Expenses section based on the selected scenario
+// Function to update the Monthly Expenses section based on the selected scenario
+// Function to update the Monthly Expenses section based on the selected scenario
+// Function to update the Monthly Expenses section based on the selected scenario
+function updateMonthlyExpensesScenario() {
+    const scenarioIndex = parseInt(document.getElementById('expense-down-payment-options').value); // Get the selected scenario index
 
+    // Fetch the stored monthly payment for the selected scenario
+    const monthlyPayment = parseFloat(document.getElementById(`result-payment${scenarioIndex}`).getAttribute('data-monthly-payment'));
+
+    if (!isNaN(monthlyPayment)) {
+        document.getElementById('monthly-expense-mortgage-payment').innerText = `$${monthlyPayment.toFixed(2)}`;
+        calculateTotalMonthlyExpenses(); // Update total monthly expenses
+    }
+}
+
+
+
+// Function to be called whenever the down payment inputs change in the mortgage calculator
+function onMortgageCalculatorInputChange() {
+    updateDownPaymentValuesFromCalculator();
+}
+
+        // Function to calculate total monthly expenses
+// Function to calculate total monthly expenses
+function calculateTotalMonthlyExpenses() {
+    const mortgagePayment = parseFloat(document.getElementById('monthly-expense-mortgage-payment').innerText.replace('$', '').replace(',', '')) || 0;
+    const propertyTax = parseFloat(document.getElementById('property-tax').value) || 0;
+    const monthlyDebtPayments = parseFloat(document.getElementById('monthly-debt-payments').value) || 0;
+    const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+    const propertyInsurance = parseFloat(document.getElementById('property-insurance').value) || 0;
+    const phone = parseFloat(document.getElementById('phone').value) || 0;
+    const cable = parseFloat(document.getElementById('cable').value) || 0;
+    const internet = parseFloat(document.getElementById('internet').value) || 0;
+
+    const totalMonthlyExpenses = mortgagePayment + propertyTax + monthlyDebtPayments + utilities + propertyInsurance + phone + cable + internet;
+    document.getElementById('total-monthly-expenses').innerText = `$${totalMonthlyExpenses.toFixed(2)}`;
+}
+
+// Attach event listeners for real-time updates in Monthly Expenses section
+document.getElementById('property-tax').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('monthly-debt-payments').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('utilities').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('property-insurance').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('phone').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('cable').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('internet').addEventListener('input', calculateTotalMonthlyExpenses);
+
+        
+
+
+
+        // Function to update down payment values in the "Monthly Expenses" section
+// Function to update down payment values in the "Monthly Expenses" section
+function updateDownPaymentOptionsForExpenses() {
+    const downPaymentSelect = document.getElementById('expense-down-payment-options');
+    downPaymentSelect.innerHTML = ''; // Clear existing options
+
+    downPaymentValues.forEach((value, index) => {
+        const option = document.createElement('option');
+        option.value = index + 1; // Use index + 1 to match the scenario numbering
+        option.text = `Scenario ${index + 1} (${value.toFixed(2)}% down)`;
+        downPaymentSelect.appendChild(option);
+    });
+
+    downPaymentSelect.selectedIndex = 0; // Automatically select the first option
+    updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
+}
+
+// Attach an event listener to update the Monthly Expenses when a scenario is selected
+document.getElementById('expense-down-payment-options').addEventListener('change', updateMonthlyExpensesScenario);
+
+
+
+
+// Function to update down payment values based on user input from the mortgage calculator
+
+
+        </script>
 </body>
 </html>
