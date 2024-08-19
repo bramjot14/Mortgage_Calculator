@@ -760,6 +760,85 @@
         </div>
     </div>
 
+    <!-- Interest Rate Risk Section -->
+    <div class="container">
+        <h2 class="calculator-heading">Interest rate risk</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <p>When calculating your mortgage costs, it’s important to look at the long-term horizon. The mortgage rate you pay today could be substantially different from the mortgage rates available in the future.</p>
+                <label for="interest-rate-down-payment-options">Down payment options</label>
+                <select id="interest-rate-down-payment-options" class="form-select" onchange="updateInterestRateScenario()">
+                    <option value="1">Scenario 1 (6.7% down)</option>
+                    <option value="2">Scenario 2 (10% down)</option>
+                    <option value="3">Scenario 3 (15% down)</option>
+                    <option value="4">Scenario 4 (20% down)</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Mortgage amount today</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div id="current-mortgage-amount">$494,000</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Principal paid off over term</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div id="principal-paid">$61,807</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label>Balance remaining at the end of your current term</label>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div id="balance-remaining">$432,193</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Selected Rate</th>
+                                    <th>Interest rate</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Selected Rate</td>
+                                    <td>4.29%</td>
+                                    <td id="payment-4-29">$2,677</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Rate -2%</td>
+                                    <td>2.29%</td>
+                                    <td id="payment-2-29">$2,244</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Rate +2%</td>
+                                    <td>6.29%</td>
+                                    <td id="payment-6-29">$3,149</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Rate +5%</td>
+                                    <td>9.29%</td>
+                                    <td id="payment-9-29">$3,921</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // Ontario Land Transfer Tax rates
         const ontarioLandTransferTaxRates = [
@@ -780,149 +859,115 @@
         ];
         
         // Function to calculate land transfer tax based on property price and tax rates
-        function calculateLandTransferTax(price, taxRates) {
-            let tax = 0;
-            let remainingPrice = price;
-        
-            for (let i = 0; i < taxRates.length; i++) {
-                const { threshold, rate } = taxRates[i];
-        
-                if (remainingPrice > threshold) {
-                    tax += threshold * rate;
-                    remainingPrice -= threshold;
-                } else {
-                    tax += remainingPrice * rate;
-                    break;
-                }
-            }
-        
-            return tax;
+function calculateLandTransferTax(price, taxRates) {
+    let tax = 0;
+    let remainingPrice = price;
+
+    for (let i = 0; i < taxRates.length; i++) {
+        const { threshold, rate } = taxRates[i];
+
+        if (remainingPrice > threshold) {
+            tax += threshold * rate;
+            remainingPrice -= threshold;
+        } else {
+            tax += remainingPrice * rate;
+            break;
         }
-        
-        // Function to calculate total land transfer tax in Toronto (Ontario + Municipal)
-        function calculateTotalLandTransferTax(price) {
-            const ontarioTax = calculateLandTransferTax(price, ontarioLandTransferTaxRates);
-            const torontoTax = calculateLandTransferTax(price, torontoLandTransferTaxRates);
-            return ontarioTax + torontoTax;
-        }
-        
-        // Function to reset and update cost inputs when price changes
-        function resetCostInputs() {
-            document.getElementById('lawyer-fees').value = 1000;
-            document.getElementById('title-insurance').value = 900;
-            document.getElementById('home-inspection').value = 500;
-            document.getElementById('appraisal-fees').value = 300;
-            document.getElementById('estoppel-fee').value = 0;
-        }
-        
-        // Function to clear cash needed to close values
-        function clearCashNeededToClose() {
-            document.getElementById('down-payment-amount').innerText = 'None';
-            document.getElementById('land-transfer-tax').innerText = 'None';
-            document.getElementById('pst-mortgage-insurance').innerText = 'None';
-            document.getElementById('cash-needed').innerText = 'None';
-        
-            // Clear the cost input fields
-            document.getElementById('lawyer-fees').value = '';
-            document.getElementById('title-insurance').value = '';
-            document.getElementById('home-inspection').value = '';
-            document.getElementById('appraisal-fees').value = '';
-            document.getElementById('estoppel-fee').value = '';
-        }
-        
-        // Function to toggle between property types (House and Condo)
-        function toggleType(type) {
-            document.getElementById('houseBtn').classList.remove('active');
-            document.getElementById('condoBtn').classList.remove('active');
-        
-            const price = parseFloat(document.getElementById('price').value);
-        
-            if (type === 'house') {
-                document.getElementById('houseBtn').classList.add('active');
-                document.getElementById('estoppel-row').style.display = 'none'; // Hide Estoppel fee for House
-            } else if (type === 'condo') {
-                document.getElementById('condoBtn').classList.add('active');
-                document.getElementById('estoppel-row').style.display = 'flex'; // Show Estoppel fee for Condo
-            }
-        
-            // Update the land transfer tax dynamically based on the price
-            const landTransferTax = calculateTotalLandTransferTax(price);
-            document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
-        
-            calculateCashNeeded(); // Update the total cash needed to close
-        }
-        
-        // Function to calculate CMHC Insurance rate based on down payment percentage
-        function calculateInsuranceRate(downPaymentPercentage) {
-            if (downPaymentPercentage < 5) {
-                return 0;
-            } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
-                return 4.00;
-            } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
-                return 3.10;
-            } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
-                return 2.80;
-            } else {
-                return 0;
-            }
-        }
-        
-        // Function to update down payment option based on user selection
-        function updateDownPaymentOption() {
-            const downPaymentOption = parseFloat(document.getElementById('down-payment-options').value);
-            const price = parseFloat(document.getElementById('price').value);
-        
-            const downPayment = (downPaymentOption / 100) * price;
-            document.getElementById('down-payment-amount').innerText = `$${downPayment.toLocaleString()}`;
-        
-            // Update PST on mortgage insurance
-            if (downPaymentOption < 20) {
-                const insuredMortgage = price - downPayment;
-                const cmhcInsurance = (insuredMortgage * calculateInsuranceRate(downPaymentOption)) / 100;
-                const pstMortgageInsurance = cmhcInsurance * 0.08; // 8% PST on mortgage insurance
-                document.getElementById('pst-mortgage-insurance').innerText = `$${pstMortgageInsurance.toFixed(2)}`;
-            } else {
-                document.getElementById('pst-mortgage-insurance').innerText = '$0.00';
-            }
-        
-            calculateCashNeeded(); // Update the total cash needed to close
-            updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
-        }
-        
-        // Function to calculate the total cash needed to close based on various inputs
-        function calculateCashNeeded() {
-            const downPayment = parseFloat(document.getElementById('down-payment-amount').innerText.replace('$', '').replace(',', '')) || 0;
-            const landTransferTax = parseFloat(document.getElementById('land-transfer-tax').innerText.replace('$', '').replace(',', '')) || 0;
-            const pstMortgageInsurance = parseFloat(document.getElementById('pst-mortgage-insurance').innerText.replace('$', '').replace(',', '')) || 0;
-            const lawyerFees = parseFloat(document.getElementById('lawyer-fees').value) || 0;
-            const titleInsurance = parseFloat(document.getElementById('title-insurance').value) || 0;
-            const homeInspection = parseFloat(document.getElementById('home-inspection').value) || 0;
-            const appraisalFees = parseFloat(document.getElementById('appraisal-fees').value) || 0;
-            const estoppelFee = parseFloat(document.getElementById('estoppel-fee').value) || 0;
-        
-            // Include Estoppel fee in the calculation
-            const cashNeeded = downPayment + landTransferTax + pstMortgageInsurance + lawyerFees + titleInsurance + homeInspection + appraisalFees + estoppelFee;
-            document.getElementById('cash-needed').innerText = `$${cashNeeded.toFixed(2)}`;
-        }
-        
-        // Function to update the down payment options in the "Cash needed to close" section
-        function updateDownPaymentOptionsFromCalculator() {
-            const downPaymentSelect = document.getElementById('down-payment-options');
-            downPaymentSelect.innerHTML = '';
-        
-            downPaymentValues.forEach((value, index) => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.text = `Scenario ${index + 1} (${value.toFixed(2)}% down)`;
-                downPaymentSelect.appendChild(option);
-            });
-        
-            // Automatically select the first option and update the down payment scenario
-            downPaymentSelect.selectedIndex = 0;
-            updateDownPaymentOption();
-        }
-        
-        // Function to update down payment values based on user input from the mortgage calculator
+    }
+
+    return tax;
+}
+
+// Function to calculate total land transfer tax in Toronto (Ontario + Municipal)
+function calculateTotalLandTransferTax(price) {
+    const ontarioTax = calculateLandTransferTax(price, ontarioLandTransferTaxRates);
+    const torontoTax = calculateLandTransferTax(price, torontoLandTransferTaxRates);
+    return ontarioTax + torontoTax;
+}
+
+// Function to reset and update cost inputs when price changes
+function resetCostInputs() {
+    document.getElementById('lawyer-fees').value = 1000;
+    document.getElementById('title-insurance').value = 900;
+    document.getElementById('home-inspection').value = 500;
+    document.getElementById('appraisal-fees').value = 300;
+    document.getElementById('estoppel-fee').value = 0;
+}
+
+// Function to clear cash needed to close values
+function clearCashNeededToClose() {
+    document.getElementById('down-payment-amount').innerText = 'None';
+    document.getElementById('land-transfer-tax').innerText = 'None';
+    document.getElementById('pst-mortgage-insurance').innerText = 'None';
+    document.getElementById('cash-needed').innerText = 'None';
+
+    // Clear the cost input fields
+    document.getElementById('lawyer-fees').value = '';
+    document.getElementById('title-insurance').value = '';
+    document.getElementById('home-inspection').value = '';
+    document.getElementById('appraisal-fees').value = '';
+    document.getElementById('estoppel-fee').value = '';
+}
+
+// Function to toggle between property types (House and Condo)
+function toggleType(type) {
+    document.getElementById('houseBtn').classList.remove('active');
+    document.getElementById('condoBtn').classList.remove('active');
+
+    const price = parseFloat(document.getElementById('price').value);
+
+    if (type === 'house') {
+        document.getElementById('houseBtn').classList.add('active');
+        document.getElementById('estoppel-row').style.display = 'none'; // Hide Estoppel fee for House
+    } else if (type === 'condo') {
+        document.getElementById('condoBtn').classList.add('active');
+        document.getElementById('estoppel-row').style.display = 'flex'; // Show Estoppel fee for Condo
+    }
+
+    // Update the land transfer tax dynamically based on the price
+    const landTransferTax = calculateTotalLandTransferTax(price);
+    document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
+
+    calculateCashNeeded(); // Update the total cash needed to close
+}
+
+// Function to update down payment values in the "Cash needed to close" section
+function updateDownPaymentOption() {
+    const downPaymentOption = parseFloat(document.getElementById('down-payment-options').value);
+    const price = parseFloat(document.getElementById('price').value);
+
+    const downPayment = (downPaymentOption / 100) * price;
+    document.getElementById('down-payment-amount').innerText = `$${downPayment.toLocaleString()}`;
+
+    // Update PST on mortgage insurance
+    if (downPaymentOption < 20) {
+        const insuredMortgage = price - downPayment;
+        const cmhcInsurance = (insuredMortgage * calculateInsuranceRate(downPaymentOption)) / 100;
+        const pstMortgageInsurance = cmhcInsurance * 0.08; // 8% PST on mortgage insurance
+        document.getElementById('pst-mortgage-insurance').innerText = `$${pstMortgageInsurance.toFixed(2)}`;
+    } else {
+        document.getElementById('pst-mortgage-insurance').innerText = '$0.00';
+    }
+
+    calculateCashNeeded(); // Update the total cash needed to close
+    updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
+}
+
+// Function to calculate CMHC Insurance rate based on down payment percentage
+function calculateInsuranceRate(downPaymentPercentage) {
+    if (downPaymentPercentage < 5) {
+        return 0;
+    } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
+        return 4.00;
+    } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
+        return 3.10;
+    } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
+        return 2.80;
+    } else {
+        return 0;
+    }
+}
+
 // Function to update down payment values based on user input from the mortgage calculator
 function updateDownPaymentValuesFromCalculator() {
     // Assuming these values come from the mortgage calculator inputs
@@ -936,66 +981,76 @@ function updateDownPaymentValuesFromCalculator() {
     // Update the down payment options in both sections
     updateDownPaymentOptionsFromCalculator(); // For "Cash needed to close"
     updateDownPaymentOptionsForExpenses(); // For "Monthly Expenses"
+    updateInterestRateScenario(); 
 }
 
-        
-        // Update Down Payment and Other Values Based on Price Input
-        function updateDownPayments() {
-            const price = parseFloat(document.getElementById('price').value);
-            const errorMessagePrice = document.getElementById('error-message-price');
-        
-            if (isNaN(price) || price === 0) {
-                clearResults();
-                clearCashNeededToClose(); // Clear the "Cash needed to close" values
-                errorMessagePrice.innerText = 'Please enter a valid price.';
-                return;
-            }
-        
-            // Clear the error message if the price is valid
-            errorMessagePrice.innerText = '';
-        
-            // Reset all cost inputs
-            resetCostInputs();
-        
-            // Update Down Payment Values
-            updateDownPaymentValues(1);
-            updateDownPaymentValues(2);
-            updateDownPaymentValues(3);
-            updateDownPaymentValues(4);
-        
-            // Update Cash Needed to Close Section
-            updateDownPaymentOptionsFromCalculator();
-            updateDownPaymentOption();
-        
-            // Dynamically update the land transfer tax
-            const landTransferTax = calculateTotalLandTransferTax(price);
-            document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
-        
-            calculateCashNeeded(); // Update the total cash needed to close
-        }
-        
-        function updateDownPaymentValues(index) {
-            const price = parseFloat(document.getElementById('price').value);
-            const downPaymentPercentage = parseFloat(document.getElementById(`down_payment${index}`).value);
-            const errorMessage = document.getElementById(`error-message${index}`);
-        
-            if (isNaN(price) || isNaN(downPaymentPercentage)) {
-                clearResult(index);
-                errorMessage.innerText = 'Please enter valid down payment percentage.';
-                return;
-            }
-        
-            // Clear the error message if both inputs are valid
-            errorMessage.innerText = '';
-        
-            const downPayment = (downPaymentPercentage / 100) * price;
-            document.getElementById(`down_payment_value${index}`).innerText = `$${downPayment.toFixed(2)}`;
-        
-            calculateMortgage(index);  // Recalculate mortgage details for the specific index
-        }
-        
-        
-        function calculateMortgage(index) {
+let downPaymentValues = [6.7, 10, 15, 20]; // Default values
+// Function to update down payment values globally when the user changes them in the calculator
+function updateDownPaymentValues(index) {
+    const price = parseFloat(document.getElementById('price').value);
+    const downPaymentPercentage = parseFloat(document.getElementById(`down_payment${index}`).value);
+    const errorMessage = document.getElementById(`error-message${index}`);
+    
+    // Check if down payment exceeds 100%
+    if (downPaymentPercentage > 100) {
+        clearResult(index);
+        errorMessage.innerText = 'Down payment percentage cannot exceed 100%.';
+        return;
+    }
+
+    if (isNaN(price) || isNaN(downPaymentPercentage)) {
+        clearResult(index);
+        errorMessage.innerText = 'Please enter valid down payment percentage.';
+        return;
+    }
+    
+    // Clear the error message if both inputs are valid
+    errorMessage.innerText = '';
+    
+    const downPayment = (downPaymentPercentage / 100) * price;
+    document.getElementById(`down_payment_value${index}`).innerText = `$${Math.round(downPayment)}`;
+
+    // Update the global variable with the new value
+    downPaymentValues[index - 1] = downPaymentPercentage;
+    
+    calculateMortgage(index);  // Recalculate mortgage details for the specific index
+    updateInterestRateScenario(); // Recalculate interest rate risk with new down payment
+}
+
+// Function to calculate the total cash needed to close based on various inputs
+function calculateCashNeeded() {
+    const downPayment = parseFloat(document.getElementById('down-payment-amount').innerText.replace('$', '').replace(',', '')) || 0;
+    const landTransferTax = parseFloat(document.getElementById('land-transfer-tax').innerText.replace('$', '').replace(',', '')) || 0;
+    const pstMortgageInsurance = parseFloat(document.getElementById('pst-mortgage-insurance').innerText.replace('$', '').replace(',', '')) || 0;
+    const lawyerFees = parseFloat(document.getElementById('lawyer-fees').value) || 0;
+    const titleInsurance = parseFloat(document.getElementById('title-insurance').value) || 0;
+    const homeInspection = parseFloat(document.getElementById('home-inspection').value) || 0;
+    const appraisalFees = parseFloat(document.getElementById('appraisal-fees').value) || 0;
+    const estoppelFee = parseFloat(document.getElementById('estoppel-fee').value) || 0;
+    
+    // Include Estoppel fee in the calculation
+    const cashNeeded = downPayment + landTransferTax + pstMortgageInsurance + lawyerFees + titleInsurance + homeInspection + appraisalFees + estoppelFee;
+    document.getElementById('cash-needed').innerText = `$${Math.round(cashNeeded)}`;
+}
+
+// Function to update the down payment options in the "Cash needed to close" section
+function updateDownPaymentOptionsFromCalculator() {
+    const downPaymentSelect = document.getElementById('down-payment-options');
+    downPaymentSelect.innerHTML = '';
+
+    downPaymentValues.forEach((value, index) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.text = `Scenario ${index + 1} (${value.toFixed(2)}% down)`;
+        downPaymentSelect.appendChild(option);
+    });
+
+    // Automatically select the first option and update the down payment scenario
+    downPaymentSelect.selectedIndex = 0;
+    updateDownPaymentOption();
+}
+
+function calculateMortgage(index) {
     const price = parseFloat(document.getElementById('price').value);
     const downPayment = parseFloat(document.getElementById(`down_payment_value${index}`).innerText.replace('$', '').replace(',', ''));
     const amortization = parseInt(document.getElementById(`amortization${index}`).value);
@@ -1017,58 +1072,72 @@ function updateDownPaymentValuesFromCalculator() {
     // Calculate the monthly payment specifically for the "Monthly Expenses" section
     const monthlyPayment = calculatePayment(insuredMortgage, amortization, mortgageRate, "Monthly");
 
-    document.getElementById(`result-cmhc${index}`).innerText = `$${cmhcInsurance.toFixed(2)}`;
-    document.getElementById(`result-total-mortgage${index}`).innerText = `$${insuredMortgage.toFixed(2)}`;
-    document.getElementById(`result-payment${index}`).innerText = `$${payment.toFixed(2)}`;
+    document.getElementById(`result-cmhc${index}`).innerText = `$${Math.round(cmhcInsurance)}`;
+    document.getElementById(`result-total-mortgage${index}`).innerText = `$${Math.round(insuredMortgage)}`;
+    document.getElementById(`result-payment${index}`).innerText = `$${Math.round(payment)}`;
 
     // Store the monthly payment in a data attribute for later use in the "Monthly Expenses" section
-    document.getElementById(`result-payment${index}`).setAttribute('data-monthly-payment', monthlyPayment.toFixed(2));
+    document.getElementById(`result-payment${index}`).setAttribute('data-monthly-payment', Math.round(monthlyPayment));
 
     updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
 }
 
 
-        function validateDownPayment(price, downPayment, index) {
-            let minimumDownPayment;
-            const errorMessageElement = document.getElementById(`error-message${index}`);
-            
-            if (price <= 500000) {
-                minimumDownPayment = 0.05 * price;
-            } else if (price > 500000 && price < 1000000) {
-                minimumDownPayment = (0.05 * 500000) + (0.10 * (price - 500000));
-            } else {
-                minimumDownPayment = 0.20 * price;
-            }
-        
-            if (downPayment < minimumDownPayment) {
-                errorMessageElement.innerText = `The minimum down payment for a property of $${price.toFixed(2)} is ${(minimumDownPayment / price * 100).toFixed(2)}%. Please increase your down payment.`;
-                return false;
-            }
-        
-            errorMessageElement.innerText = '';  // Clear error message if inputs are valid
-            return true;
-        }
-        
-        function calculateCMHCInsurance(totalMortgage, price, downPayment) {
-            const downPaymentPercentage = (downPayment / price) * 100;
-            let insuranceRate = 0;
-        
-            if (downPaymentPercentage < 5) {
-                throw new Error("Minimum down payment is 5%");
-            } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
-                insuranceRate = 4.00;
-            } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
-                insuranceRate = 3.10;
-            } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
-                insuranceRate = 2.80;
-            } else {
-                return 0;
-            }
-        
-            return (insuranceRate / 100) * totalMortgage;
-        }
-        
-        function calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency) {
+// Function to update the Monthly Expenses section based on the selected scenario
+function updateMonthlyExpensesScenario() {
+    const scenarioIndex = parseInt(document.getElementById('expense-down-payment-options').value); // Get the selected scenario index
+
+    // Fetch the stored monthly payment for the selected scenario
+    const monthlyPayment = parseFloat(document.getElementById(`result-payment${scenarioIndex}`).getAttribute('data-monthly-payment'));
+
+    if (!isNaN(monthlyPayment)) {
+        document.getElementById('monthly-expense-mortgage-payment').innerText = `$${monthlyPayment.toFixed(2)}`;
+        calculateTotalMonthlyExpenses(); // Update total monthly expenses
+    }
+}
+
+// Function to validate down payment amount
+function validateDownPayment(price, downPayment, index) {
+    let minimumDownPayment;
+    const errorMessageElement = document.getElementById(`error-message${index}`);
+    
+    if (price <= 500000) {
+        minimumDownPayment = 0.05 * price;
+    } else if (price > 500000 && price < 1000000) {
+        minimumDownPayment = (0.05 * 500000) + (0.10 * (price - 500000));
+    } else {
+        minimumDownPayment = 0.20 * price;
+    }
+
+    if (downPayment < minimumDownPayment) {
+        errorMessageElement.innerText = `The minimum down payment for a property of $${price.toFixed(2)} is ${(minimumDownPayment / price * 100).toFixed(2)}%. Please increase your down payment.`;
+        return false;
+    }
+
+    errorMessageElement.innerText = '';  // Clear error message if inputs are valid
+    return true;
+}
+
+function calculateCMHCInsurance(totalMortgage, price, downPayment) {
+    const downPaymentPercentage = (downPayment / price) * 100;
+    let insuranceRate = 0;
+
+    if (downPaymentPercentage < 5) {
+        throw new Error("Minimum down payment is 5%");
+    } else if (downPaymentPercentage >= 5 && downPaymentPercentage < 10) {
+        insuranceRate = 4.00;
+    } else if (downPaymentPercentage >= 10 && downPaymentPercentage < 15) {
+        insuranceRate = 3.10;
+    } else if (downPaymentPercentage >= 15 && downPaymentPercentage < 20) {
+        insuranceRate = 2.80;
+    } else {
+        return 0;
+    }
+
+    return (insuranceRate / 100) * totalMortgage;
+}
+
+function calculatePayment(insuredMortgage, amortization, mortgageRate, paymentFrequency) {
     let numPayments;
     let paymentRate;
 
@@ -1091,93 +1160,119 @@ function updateDownPaymentValuesFromCalculator() {
            (Math.pow(1 + paymentRate, numPayments) - 1);
 }
 
-        
-        function clearResults() {
-            for (let i = 1; i <= 4; i++) {
-                clearResult(i);
-            }
-        }
-        
-        function clearResult(index) {
-            document.getElementById(`result-cmhc${index}`).innerText = '$0.00';
-            document.getElementById(`result-total-mortgage${index}`).innerText = '$0.00';
-            document.getElementById(`result-payment${index}`).innerText = '$0.00';
-        }
-        
-        // Initial setup
-        let downPaymentValues = [6.7, 10, 15, 20]; // Default values as percentages
-        updateDownPaymentOptionsFromCalculator();
-        
-        // Ensure all calculations are done on page load and when inputs change
-        document.addEventListener("DOMContentLoaded", function() {
-            updateAllCalculations(); // Initial calculation when page loads
-        });
-        
-        function updateAllCalculations() {
-            updateDownPayments();
-            updateDownPaymentOption();
-            calculateCashNeeded();
-        }
-        
-        // Attach `oninput` event listeners to update calculations as the user types
-        document.querySelectorAll('.cost-input').forEach(input => {
-            input.addEventListener('input', calculateCashNeeded);
-        });
+// Function to update the Interest Rate Risk section dynamically
+let scenariosData = {
+    1: { amortization: 25, interestRate: 4.29, mortgageAmount: 0, principalPaid: 0, balanceRemaining: 0 },
+    2: { amortization: 25, interestRate: 4.29, mortgageAmount: 0, principalPaid: 0, balanceRemaining: 0 },
+    3: { amortization: 25, interestRate: 4.29, mortgageAmount: 0, principalPaid: 0, balanceRemaining: 0 },
+    4: { amortization: 25, interestRate: 4.29, mortgageAmount: 0, principalPaid: 0, balanceRemaining: 0 }
+};
 
-        // Function to update the Monthly Expenses section based on selected scenario
-        // Function to update the Monthly Expenses section based on the selected scenario
-// Function to update the Monthly Expenses section based on the selected scenario
-// Function to update the Monthly Expenses section based on the selected scenario
-// Function to update the Monthly Expenses section based on the selected scenario
-function updateMonthlyExpensesScenario() {
-    const scenarioIndex = parseInt(document.getElementById('expense-down-payment-options').value); // Get the selected scenario index
+function updateInterestRateScenario() {
+    const price = parseFloat(document.getElementById('price').value);
+    const selectedScenario = parseInt(document.getElementById('interest-rate-down-payment-options').value);
 
-    // Fetch the stored monthly payment for the selected scenario
-    const monthlyPayment = parseFloat(document.getElementById(`result-payment${scenarioIndex}`).getAttribute('data-monthly-payment'));
-
-    if (!isNaN(monthlyPayment)) {
-        document.getElementById('monthly-expense-mortgage-payment').innerText = `$${monthlyPayment.toFixed(2)}`;
-        calculateTotalMonthlyExpenses(); // Update total monthly expenses
+    const downPaymentPercentage = downPaymentValues[selectedScenario - 1];
+    if (isNaN(price) || isNaN(downPaymentPercentage)) {
+        clearInterestRateRiskSection(); // Clear the section if inputs are invalid
+        return;
     }
+
+    const downPayment = (downPaymentPercentage / 100) * price;
+    const totalMortgage = price - downPayment + calculateCMHCInsurance(price - downPayment, price, downPayment);
+
+    scenariosData[selectedScenario].mortgageAmount = totalMortgage;
+
+    document.getElementById('current-mortgage-amount').innerText = `$${totalMortgage.toFixed(2)}`;
+
+    const amortizationYears = parseInt(document.getElementById(`amortization${selectedScenario}`).value);
+    const interestRate = parseFloat(document.getElementById(`mortgage_rate${selectedScenario}`).value) / 100;
+
+    scenariosData[selectedScenario].amortization = amortizationYears;
+    scenariosData[selectedScenario].interestRate = interestRate;
+
+    const principalPaid = calculatePrincipalPaid(totalMortgage, interestRate, 5, amortizationYears);
+    const balanceRemaining = totalMortgage - principalPaid;
+
+    scenariosData[selectedScenario].principalPaid = principalPaid;
+    scenariosData[selectedScenario].balanceRemaining = balanceRemaining;
+
+    document.getElementById('principal-paid').innerText = `$${principalPaid.toFixed(2)}`;
+    document.getElementById('balance-remaining').innerText = `$${balanceRemaining.toFixed(2)}`;
+
+    updateInterestPayments(balanceRemaining);
 }
 
 
 
-// Function to be called whenever the down payment inputs change in the mortgage calculator
-function onMortgageCalculatorInputChange() {
-    updateDownPaymentValuesFromCalculator();
+function clearInterestRateRiskSection() {
+    document.getElementById('current-mortgage-amount').innerText = "$0";
+    document.getElementById('principal-paid').innerText = "$0";
+    document.getElementById('balance-remaining').innerText = "$0";
 }
 
-        // Function to calculate total monthly expenses
-// Function to calculate total monthly expenses
-function calculateTotalMonthlyExpenses() {
-    const mortgagePayment = parseFloat(document.getElementById('monthly-expense-mortgage-payment').innerText.replace('$', '').replace(',', '')) || 0;
-    const propertyTax = parseFloat(document.getElementById('property-tax').value) || 0;
-    const monthlyDebtPayments = parseFloat(document.getElementById('monthly-debt-payments').value) || 0;
-    const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-    const propertyInsurance = parseFloat(document.getElementById('property-insurance').value) || 0;
-    const phone = parseFloat(document.getElementById('phone').value) || 0;
-    const cable = parseFloat(document.getElementById('cable').value) || 0;
-    const internet = parseFloat(document.getElementById('internet').value) || 0;
 
-    const totalMonthlyExpenses = mortgagePayment + propertyTax + monthlyDebtPayments + utilities + propertyInsurance + phone + cable + internet;
-    document.getElementById('total-monthly-expenses').innerText = `$${totalMonthlyExpenses.toFixed(2)}`;
+// Ensure updateInterestRateScenario is called whenever inputs change
+function attachEventListeners() {
+    // Attach listeners to interest rate and amortization inputs for immediate recalculations
+    document.querySelectorAll('.amortization-input, .interest-rate-input').forEach(input => {
+        input.addEventListener('input', function() {
+            console.log("Input changed:", input.id, "New value:", input.value);
+            updateInterestRateScenario();
+        });
+    });
 }
 
-// Attach event listeners for real-time updates in Monthly Expenses section
-document.getElementById('property-tax').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('monthly-debt-payments').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('utilities').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('property-insurance').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('phone').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('cable').addEventListener('input', calculateTotalMonthlyExpenses);
-document.getElementById('internet').addEventListener('input', calculateTotalMonthlyExpenses);
+    // Ensure that changing scenarios also triggers the recalculation
+    document.getElementById('interest-rate-down-payment-options').addEventListener('change', updateInterestRateScenario);
+document.querySelectorAll('.amortization-input, .interest-rate-input').forEach(input => {
+    input.addEventListener('input', updateInterestRateScenario);
+});
 
-        
+document.addEventListener("DOMContentLoaded", function() {
+    attachEventListeners();
+    updateInterestRateScenario();
+    updateAllCalculations(); // Ensure all values are initially calculated on page load
+});
 
 
 
-        // Function to update down payment values in the "Monthly Expenses" section
+
+// Function to calculate the principal paid off during the term
+function calculatePrincipalPaid(mortgageAmount, interestRate, termYears, amortizationYears) {
+    const monthlyInterestRate = interestRate / 12;
+    const totalPayments = amortizationYears * 12; // Total number of payments over the amortization period
+    const termPayments = termYears * 12; // Number of payments over the term
+
+    // Monthly payment formula
+    const monthlyPayment = (mortgageAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) / 
+                           (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+
+    let principalPaid = 0;
+    let balance = mortgageAmount;
+
+    for (let i = 0; i < termPayments; i++) {
+        const interestPayment = balance * monthlyInterestRate;
+        const principalPayment = monthlyPayment - interestPayment;
+        principalPaid += principalPayment;
+        balance -= principalPayment;
+    }
+
+    return principalPaid;
+}
+
+
+
+// Function to update payments based on different interest rates
+function updateInterestPayments(balanceRemaining) {
+    const rates = [4.29, 2.29, 6.29, 9.29];
+
+    rates.forEach(rate => {
+        const payment = calculatePayment(balanceRemaining, 25, rate / 100, 'Monthly');
+        document.getElementById(`payment-${rate.toFixed(2).replace('.', '-')}`).innerText = `$${payment.toFixed(2)}`;
+    });
+}
+
 // Function to update down payment values in the "Monthly Expenses" section
 function updateDownPaymentOptionsForExpenses() {
     const downPaymentSelect = document.getElementById('expense-down-payment-options');
@@ -1194,14 +1289,116 @@ function updateDownPaymentOptionsForExpenses() {
     updateMonthlyExpensesScenario(); // Update the Monthly Expenses section
 }
 
-// Attach an event listener to update the Monthly Expenses when a scenario is selected
-document.getElementById('expense-down-payment-options').addEventListener('change', updateMonthlyExpensesScenario);
+// Function to calculate total monthly expenses
+function calculateTotalMonthlyExpenses() {
+    const mortgagePayment = parseFloat(document.getElementById('monthly-expense-mortgage-payment').innerText.replace('$', '').replace(',', '')) || 0;
+    const propertyTax = parseFloat(document.getElementById('property-tax').value) || 0;
+    const monthlyDebtPayments = parseFloat(document.getElementById('monthly-debt-payments').value) || 0;
+    const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+    const propertyInsurance = parseFloat(document.getElementById('property-insurance').value) || 0;
+    const phone = parseFloat(document.getElementById('phone').value) || 0;
+    const cable = parseFloat(document.getElementById('cable').value) || 0;
+    const internet = parseFloat(document.getElementById('internet').value) || 0;
+
+    const totalMonthlyExpenses = mortgagePayment + propertyTax + monthlyDebtPayments + utilities + propertyInsurance + phone + cable + internet;
+    document.getElementById('total-monthly-expenses').innerText = `$${Math.round(totalMonthlyExpenses)}`;
+}
+
+// Function to clear results in the calculator
+function clearResults() {
+    for (let i = 1; i <= 4; i++) {
+        clearResult(i);
+    }
+}
+
+// Function to clear individual results
+function clearResult(index) {
+    document.getElementById(`result-cmhc${index}`).innerText = '$0.00';
+    document.getElementById(`result-total-mortgage${index}`).innerText = '$0.00';
+    document.getElementById(`result-payment${index}`).innerText = '$0.00';
+}
+
+// Attach `oninput` event listeners to update calculations as the user types
+document.querySelectorAll('.mortgage-input').forEach(input => {
+    input.addEventListener('input', updateInterestRateScenario);
+});
 
 
 
+function updateAllCalculations() {
+    updateDownPayments();
+    updateDownPaymentOption();
+    calculateCashNeeded();
+    updateInterestRateScenario();
+}
 
-// Function to update down payment values based on user input from the mortgage calculator
 
+// Attach event listeners for real-time updates in Monthly Expenses section
+document.getElementById('property-tax').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('monthly-debt-payments').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('utilities').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('property-insurance').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('phone').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('cable').addEventListener('input', calculateTotalMonthlyExpenses);
+document.getElementById('internet').addEventListener('input', calculateTotalMonthlyExpenses);
+
+// Function to be called whenever the down payment inputs change in the mortgage calculator
+function onMortgageCalculatorInputChange() {
+    updateDownPaymentValuesFromCalculator();
+}
+
+// Update down payment values based on user input from the mortgage calculator
+function updateDownPayments() {
+    const price = parseFloat(document.getElementById('price').value);
+    const errorMessagePrice = document.getElementById('error-message-price');
+
+    if (isNaN(price) || price === 0) {
+        clearResults();
+        clearCashNeededToClose(); // Clear the "Cash needed to close" values
+        errorMessagePrice.innerText = 'Please enter a valid price.';
+        return;
+    }
+
+    errorMessagePrice.innerText = ''; // Clear the error message if the price is valid
+
+    resetCostInputs(); // Reset all cost inputs
+
+    // Update Down Payment Values
+    updateDownPaymentValues(1);
+    updateDownPaymentValues(2);
+    updateDownPaymentValues(3);
+    updateDownPaymentValues(4);
+
+    // Update the sections that rely on down payment values
+    updateDownPaymentOptionsFromCalculator();
+    updateDownPaymentOption();
+    updateInterestRateScenario();
+
+    const landTransferTax = calculateTotalLandTransferTax(price);
+    document.getElementById('land-transfer-tax').innerText = `$${landTransferTax.toLocaleString()}`;
+
+    calculateCashNeeded(); // Update the total cash needed to close
+}
+
+// Attach `oninput` event listeners to update down payments
+document.querySelectorAll('.input-group input').forEach(input => {
+    input.addEventListener('input', onMortgageCalculatorInputChange);
+});
+
+// Initial setup
+updateDownPaymentOptionsFromCalculator();
+updateAllCalculations();
+
+// Attach `oninput` event listeners to update calculations as the user types
+document.querySelectorAll('.mortgage-input, #interest-rate-down-payment-options').forEach(input => {
+    input.addEventListener('input', updateInterestRateScenario);
+});
+
+
+// Attach `oninput` event listeners to update calculations as the user types
+document.querySelectorAll('.cost-input').forEach(input => {
+    input.addEventListener('input', calculateCashNeeded);
+});
 
         </script>
 </body>
