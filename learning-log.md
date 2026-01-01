@@ -10,6 +10,7 @@ Completed:
 - Structured the project with separate views, public assets, and server logic
 - Styled the application using custom CSS for a clean, user-friendly layout
 - Practiced running and debugging a local Express server
+- Strengthened understanding of backend-driven applications without relying on frontend frameworks
 
 Key Takeaway:
 Server-side rendering with Express and EJS helps build dynamic applications where logic and UI work together. Handling calculations on the backend improves control, security, and real-world application structure.
